@@ -25,7 +25,10 @@ public class ClientRunnable implements Runnable, Observer{
         if (authorization(bufferedReader)) {
             while ((messageFromClient = bufferedReader.readLine()) != null) {
                 System.out.println(user.getName() + ": " + messageFromClient);
-                serverService.notifyObservers(user.getName() + " : " + messageFromClient);
+                serverService.notifyObserversExpectMe(user.getName() + " : " + messageFromClient, this);
+                if (messageFromClient.contains("exit")) {
+                    serverService.deleteObserver(this);
+                }
             }
         }
     }
@@ -48,7 +51,7 @@ public class ClientRunnable implements Runnable, Observer{
 
     @SneakyThrows
     @Override
-    public void notifyObserversExpectMe(String message, this) {
+    public void notifyMe(String message) {
         PrintWriter clientWriter = new PrintWriter(socket.getOutputStream());
         clientWriter.println(message);
         clientWriter.flush();
